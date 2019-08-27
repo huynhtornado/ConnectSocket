@@ -1,7 +1,59 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { Component, Suspense } from 'react';
 import './App.css';
+import ChangeLanguage from './change-language';
+import logo from './logo.svg';
 
+import { Trans, withTranslation, useTranslation } from 'react-i18next';
+
+// use hoc for class based components
+class LegacyWelcomeClass extends Component {
+  render() {
+    const { t, i18n } = this.props;
+    return <h2>{t('title')}</h2>;
+  }
+}
+const Welcome = withTranslation()(LegacyWelcomeClass);
+
+// Component using the Trans component
+function MyComponent() {
+  return (
+    <Trans i18nKey="description.part1">
+      To get started, edit <code>src/App.js</code> and save to reload.
+    </Trans>
+  );
+}
+
+// page uses the hook
+function Page() {
+  const { t, i18n } = useTranslation();
+
+  const changeLanguage = lng => {
+    i18n.changeLanguage(lng);
+  };
+
+  return (
+    <div className="App">
+      <div className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <Welcome />
+        <button onClick={() => changeLanguage('de')}>de</button>
+        <button onClick={() => changeLanguage('en')}>en</button>
+      </div>
+      <div className="App-intro">
+        <MyComponent />
+      </div>
+      <div>{t('description.part2')}</div>
+    </div>
+  );
+}
+
+// loading component for suspense fallback
+const Loader = () => (
+  <div className="App">
+    <img src={logo} className="App-logo" alt="logo" />
+    <div>loading...</div>
+  </div>
+);
 class App extends React.Component {
 
   sock = null;
@@ -11,7 +63,7 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    let wsuri = "ws://192.168.1.3:1234";
+    let wsuri = "ws://192.168.80.54:1234";
     this.sock = new WebSocket(wsuri);
 
     this.sock.onopen = function() {
@@ -34,13 +86,13 @@ class App extends React.Component {
 
   render() {
     return (
-      <div className="App">
-        <h1>WebSocket Echo Test</h1>
+      <Suspense fallback={<Loader />}>
         <form>
-        <p>Message: <input id="message" type="text" value="Hello, world!" /></p>
+          <p>Message: <input id="message" type="text" defaultValue="Hello, world!"/></p>
+          <button onClick={this.send}>Send Message</button>
         </form>
-        <button onClick={this.send}>Send Message</button>
-      </div>
+        <Page />
+      </Suspense>
     );
   }
   
