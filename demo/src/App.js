@@ -12,7 +12,7 @@ class LegacyWelcomeClass extends Component {
     return <h2>{t('title')}</h2>;
   }
 }
-const Welcome = withTranslation()(LegacyWelcomeClass);
+const Welcome = withTranslation('common')(LegacyWelcomeClass);
 
 // Component using the Trans component
 function MyComponent() {
@@ -25,19 +25,15 @@ function MyComponent() {
 
 // page uses the hook
 function Page() {
-  const { t, i18n } = useTranslation();
-
-  const changeLanguage = lng => {
-    i18n.changeLanguage(lng);
-  };
+  const { t, i18n } = useTranslation('common');
 
   return (
     <div className="App">
       <div className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <Welcome />
-        <button onClick={() => changeLanguage('de')}>de</button>
-        <button onClick={() => changeLanguage('en')}>en</button>
+        <button onClick={() => i18n.changeLanguage('de')}>de</button>
+        <button onClick={() => i18n.changeLanguage('en')}>en</button>
       </div>
       <div className="App-intro">
         <MyComponent />
@@ -89,8 +85,8 @@ class App extends React.Component {
       <Suspense fallback={<Loader />}>
         <form>
           <p>Message: <input id="message" type="text" defaultValue="Hello, world!"/></p>
-          <button onClick={this.send}>Send Message</button>
         </form>
+        <button onClick={this.send}>Send Message</button>
         <Page />
       </Suspense>
     );
@@ -98,4 +94,4 @@ class App extends React.Component {
   
 }
 
-export default App;
+export default withTranslation('common')(App);
